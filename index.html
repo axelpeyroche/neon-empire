@@ -1,1 +1,996 @@
-<!DOCTYPE html><html><head><meta http-equiv="refresh" content="0;url=neon-empire.html"></head></html>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>NEON EMPIRE 🎵</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --pink:#ff00aa;--violet:#8800ff;--cyan:#00ffff;--gold:#ffd700;
+  --dark:#06000e;--dark2:#0e0018;--dark3:#160024;
+  --text:#e8d5ff;--dim:#6644aa;--border:#1e0030;
+  --gp:0 0 14px #ff00aa,0 0 32px #ff00aa44;
+  --gv:0 0 14px #8800ff,0 0 32px #8800ff44;
+  --gc:0 0 14px #00ffff,0 0 32px #00ffff44;
+  --gg:0 0 14px #ffd700,0 0 32px #ffd70044;
+}
+html,body{width:100%;height:100%;overflow:hidden;background:#000;
+  font-family:'Segoe UI',system-ui,-apple-system,sans-serif;color:var(--text)}
+
+/* ═══ COQUE ═══ */
+#app{
+  position:fixed;top:0;left:50%;transform:translateX(-50%);
+  width:100%;max-width:480px;height:100vh;
+  background:var(--dark);display:flex;flex-direction:column;overflow:hidden
+}
+
+/* ═══ ACCUEIL ═══ */
+#ob{
+  position:absolute;inset:0;z-index:3000;
+  background:linear-gradient(180deg,#06000e 0%,#0e0018 55%,#06000e 100%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:22px;gap:14px;transition:opacity .5s
+}
+.ob-logo{font-size:52px;animation:pulse 2s ease-in-out infinite;filter:drop-shadow(0 0 22px #ff00aa)}
+.ob-title{font-size:22px;font-weight:900;text-transform:uppercase;letter-spacing:4px;text-align:center;
+  background:linear-gradient(90deg,var(--pink),var(--cyan));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.ob-sub{font-size:11px;color:var(--dim);text-align:center;line-height:1.6}
+.ob-card{width:100%;background:var(--dark2);border:1px solid var(--border);
+  border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.ob-lbl{font-size:10px;text-transform:uppercase;letter-spacing:2px;color:var(--dim)}
+.ob-input{background:var(--dark3);border:1px solid var(--border);border-radius:9px;
+  padding:11px 14px;color:var(--text);font-size:16px;width:100%;outline:none;transition:border-color .2s}
+.ob-input:focus{border-color:var(--pink);box-shadow:var(--gp)}
+.g-btns{display:flex;gap:7px}
+.g-btn{flex:1;padding:9px 4px;background:var(--dark3);border:1px solid var(--border);
+  border-radius:9px;color:var(--dim);font-size:11px;cursor:pointer;text-align:center;transition:all .2s}
+.g-btn.on{border-color:var(--pink);color:var(--pink);box-shadow:var(--gp)}
+.start-btn{width:100%;padding:14px;background:linear-gradient(135deg,var(--pink),var(--violet));
+  border:none;border-radius:12px;color:#fff;font-size:15px;font-weight:700;
+  text-transform:uppercase;letter-spacing:2px;cursor:pointer;box-shadow:var(--gp)}
+.start-btn:active{transform:scale(.97)}
+
+/* ═══ BARRE DU HAUT ═══ */
+#topbar{
+  flex-shrink:0;height:50px;
+  background:linear-gradient(180deg,var(--dark2),transparent);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;padding:0 10px;gap:6px;z-index:20
+}
+.cur{flex:1;display:flex;align-items:center;gap:5px}
+.cico{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;
+  justify-content:center;font-size:12px;font-weight:900;flex-shrink:0}
+.cico-h{background:radial-gradient(circle,#ffd700,#ff8800);box-shadow:var(--gg);color:var(--dark)}
+.cico-n{background:radial-gradient(circle,var(--pink),var(--violet));box-shadow:var(--gp);color:#fff;font-size:10px}
+.cval{font-size:13px;font-weight:700}
+.cval-h{color:var(--gold)}.cval-n{color:var(--pink)}
+.csub{font-size:8px;color:var(--dim);letter-spacing:1px}
+.pbadge{display:flex;flex-direction:column;align-items:center;padding:0 4px}
+.pnm{font-size:10px;font-weight:700;color:var(--cyan);text-transform:uppercase;letter-spacing:1px;
+  max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ptier{font-size:8px;color:var(--dim);text-align:center;max-width:90px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* ═══ VIEWPORT CARTE (58% de l'espace restant) ═══ */
+#viewport{
+  flex:0 0 58%;
+  overflow:hidden;position:relative;
+  background:radial-gradient(ellipse at 50% 40%,#0e0018 0%,#06000e 100%);
+  touch-action:none;cursor:grab
+}
+#viewport.drag{cursor:grabbing}
+
+/* Grille blueprint */
+#viewport::before{
+  content:'';position:absolute;inset:0;pointer-events:none;z-index:0;
+  background-image:
+    linear-gradient(var(--border) 1px,transparent 1px),
+    linear-gradient(90deg,var(--border) 1px,transparent 1px);
+  background-size:48px 48px;opacity:.45
+}
+
+/* Ambiance lumineuse du club */
+#viewport::after{
+  content:'';position:absolute;inset:0;pointer-events:none;z-index:1;
+  background:
+    radial-gradient(ellipse at 70% 42%,#ff00aa14 0%,transparent 45%),
+    radial-gradient(ellipse at 28% 62%,#8800ff14 0%,transparent 50%),
+    radial-gradient(ellipse at 50% 8%, #ffd70010 0%,transparent 40%);
+}
+
+/* ═══ TOILE DE CARTE ═══ */
+#mapcanvas{
+  position:absolute;top:0;left:0;
+  width:1000px;height:950px;
+  transform-origin:0 0;
+  will-change:transform;
+  z-index:2
+}
+
+/* Bordure bâtiment */
+#mapcanvas::before{
+  content:'';position:absolute;
+  top:12px;left:20px;right:20px;bottom:12px;
+  border:1px solid #2a0040;border-radius:18px;
+  pointer-events:none;z-index:0
+}
+
+/* Label du club */
+#map-label{
+  position:absolute;top:-2px;left:50%;transform:translateX(-50%);
+  font-size:10px;font-weight:700;letter-spacing:4px;color:#330055;
+  text-transform:uppercase;white-space:nowrap;pointer-events:none;z-index:0
+}
+
+/* ═══ ZONES ═══ */
+.zone{
+  position:absolute;border-radius:14px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:4px;padding:10px 8px;overflow:hidden;
+  cursor:pointer;touch-action:none;
+  transition:box-shadow .35s,background .4s,border-color .4s,outline .2s
+}
+.zone::after{
+  content:'';position:absolute;inset:0;border-radius:14px;pointer-events:none;
+  background:linear-gradient(135deg,rgba(255,255,255,.05) 0%,transparent 60%)
+}
+
+/* Paliers visuels */
+.zt1{background:linear-gradient(145deg,#12102a,#0d0b1e);
+  border:2px solid #2a2840;box-shadow:none}
+.zt2{background:linear-gradient(145deg,#300030,#1a0020);
+  border:2px solid var(--pink);box-shadow:0 0 18px #ff00aa44,inset 0 0 24px #ff00aa0d}
+.zt3{background:linear-gradient(145deg,#1a0045,#0f0030);
+  border:2px solid var(--violet);box-shadow:0 0 18px #8800ff55,inset 0 0 24px #8800ff0f}
+.zt4{background:linear-gradient(145deg,#003840,#001a20);
+  border:2px solid var(--cyan);box-shadow:0 0 22px #00ffff55,0 0 50px #00ffff22,inset 0 0 30px #00ffff0d}
+
+/* Zone sélectionnée */
+.zone.sel{outline:3px solid var(--gold);outline-offset:3px;
+  box-shadow:0 0 24px #ffd70066 !important}
+
+/* Zone verrouillée */
+.zone.locked{
+  background:linear-gradient(145deg,#0e0c1a,#0a0810) !important;
+  border:2px dashed #2a2840 !important;
+  box-shadow:none !important;opacity:.65;filter:grayscale(.6)
+}
+
+/* Contenu des zones */
+.ze{font-size:26px;line-height:1;text-align:center}
+.zn{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;
+  color:rgba(255,255,255,.85);text-align:center;line-height:1.2}
+.zt{font-size:8px;color:var(--dim);text-align:center}
+.zi{font-size:9px;font-weight:700;text-align:center}
+.zi-h{color:var(--gold)}.zi-n{color:var(--pink)}
+.zpb{width:75%;height:2px;background:rgba(255,255,255,.08);border-radius:2px;margin-top:2px}
+.zpf{height:100%;background:linear-gradient(90deg,var(--pink),var(--cyan));border-radius:2px}
+.zlk{font-size:10px;color:var(--gold);font-weight:700;text-align:center}
+.zlkr{font-size:9px;color:var(--pink);text-align:center}
+
+/* Animations zones */
+.bd{display:inline-block;animation:bd .7s ease-in-out infinite}
+.bd:nth-child(2){animation-delay:.22s}
+.bd:nth-child(3){animation-delay:.44s}
+@keyframes bd{0%,100%{transform:translateY(0) rotate(-9deg)}50%{transform:translateY(-7px) rotate(9deg)}}
+.djp{animation:djp 1.1s ease-in-out infinite}
+@keyframes djp{0%,100%{transform:scale(1) rotate(-3deg)}50%{transform:scale(1.18) rotate(3deg)}}
+
+/* Textes flottants sur la carte */
+.ft{
+  position:absolute;font-size:11px;font-weight:700;pointer-events:none;
+  z-index:50;animation:fup 1.5s ease-out forwards;white-space:nowrap
+}
+.ft-h{color:var(--gold)}.ft-n{color:var(--pink)}
+@keyframes fup{0%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-65px) scale(.65)}}
+
+/* ═══ PANNEAU DE CONTRÔLE (42% restant) ═══ */
+#panel{
+  flex:0 0 42%;
+  background:var(--dark2);border-top:1px solid var(--border);
+  display:flex;flex-direction:column;overflow:hidden;z-index:20
+}
+
+/* Barre d'info zone sélectionnée */
+#zib{
+  flex-shrink:0;display:flex;align-items:center;gap:8px;
+  padding:7px 11px;background:var(--dark3);border-bottom:1px solid var(--border);min-height:44px
+}
+#zib-e{font-size:20px;flex-shrink:0}
+#zib-n{font-size:11px;font-weight:700;flex:1;min-width:0}
+#zib-h{font-size:9px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#zib-lv{font-size:10px;color:var(--cyan);font-weight:700;flex-shrink:0}
+
+/* Rangée principale : bouton H + actions */
+#action-row{
+  flex:1;display:flex;align-items:stretch;
+  padding:8px 10px;gap:10px;overflow:hidden;min-height:0
+}
+
+/* Bouton H */
+#clickwrap{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:3px;padding-top:4px}
+#mbtn{
+  width:60px;height:60px;border-radius:50%;
+  background:radial-gradient(circle at 30% 30%,#ffd700,#ff8800,#cc5500);
+  border:3px solid #ffd700;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;font-weight:900;color:var(--dark);
+  box-shadow:var(--gg),0 4px 16px #ffd70033,inset 0 2px 0 #ffffff44;
+  transition:transform .08s,box-shadow .08s;
+  user-select:none;-webkit-user-select:none;position:relative
+}
+#mbtn:active{transform:scale(.88);box-shadow:0 0 4px var(--gold)}
+.cmult{
+  position:absolute;top:-3px;right:-3px;background:var(--pink);color:#fff;
+  font-size:7px;font-weight:700;padding:1px 4px;border-radius:6px;box-shadow:var(--gp)
+}
+#hps-lbl{font-size:8px;color:var(--gold);white-space:nowrap;text-align:center}
+
+/* Zone d'actions */
+#zone-actions{
+  flex:1;overflow-y:auto;overflow-x:hidden;
+  display:flex;flex-direction:column;gap:5px;
+  -ms-overflow-style:none;scrollbar-width:none
+}
+#zone-actions::-webkit-scrollbar{display:none}
+
+/* Boutons d'action */
+.abt{
+  flex-shrink:0;width:100%;padding:9px 11px;
+  background:linear-gradient(135deg,#ff00aa14,#8800ff14);
+  border:1px solid var(--pink);border-radius:10px;
+  color:var(--text);cursor:pointer;
+  display:flex;align-items:center;justify-content:space-between;gap:6px;
+  transition:all .15s;text-align:left
+}
+.abt:active{transform:scale(.97)}
+.abt.na{opacity:.38;border-color:var(--border);pointer-events:none}
+.abt.vl{border-color:var(--violet);background:linear-gradient(135deg,#8800ff14,transparent)}
+.abt-l{display:flex;flex-direction:column;gap:1px;align-items:flex-start;min-width:0}
+.abn{font-size:11px;font-weight:700}
+.abd{font-size:9px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px}
+.abc{font-size:10px;font-weight:700;color:var(--gold);white-space:nowrap;flex-shrink:0}
+.hint{font-size:10px;color:var(--dim);padding:6px 2px;line-height:1.5}
+.tier-prev{
+  background:var(--dark3);border:1px solid var(--border);border-radius:8px;
+  padding:7px 10px;display:flex;align-items:center;gap:8px;flex-shrink:0
+}
+
+/* Barre d'onglets */
+#tabbar{
+  flex-shrink:0;display:flex;gap:5px;
+  padding:5px 10px 6px;border-top:1px solid var(--border)
+}
+.tb{
+  flex:1;padding:6px 4px;background:var(--dark3);border:1px solid var(--border);
+  border-radius:8px;color:var(--dim);font-size:9px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.5px;cursor:pointer;text-align:center;transition:all .2s
+}
+.tb.on{background:linear-gradient(135deg,#ff00aa1a,#8800ff1a);
+  border-color:var(--pink);color:var(--pink)}
+
+/* ═══ TOAST ═══ */
+.toast{
+  position:absolute;top:56px;left:50%;transform:translateX(-50%);
+  background:var(--dark2);border:1px solid var(--gold);border-radius:10px;
+  padding:7px 14px;z-index:500;box-shadow:var(--gg);
+  font-size:12px;white-space:nowrap;text-align:center;
+  animation:tin .25s ease-out,tout .3s ease-in 2.7s forwards
+}
+@keyframes tin{from{opacity:0;transform:translateX(-50%) translateY(-8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+@keyframes tout{from{opacity:1}to{opacity:0}}
+
+/* ═══ ANIMATIONS GLOBALES ═══ */
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- ── ACCUEIL ── -->
+<div id="ob">
+  <div class="ob-logo">🎵</div>
+  <div class="ob-title">Neon Empire</div>
+  <div class="ob-sub">Transforme un entrepôt délabré en la boîte de nuit<br>la plus légendaire de la ville.</div>
+  <div class="ob-card">
+    <div class="ob-lbl">Ton prénom</div>
+    <input id="obin" class="ob-input" type="text" placeholder="Entre ton prénom…" maxlength="18">
+    <div class="ob-lbl">Identité</div>
+    <div class="g-btns">
+      <div class="g-btn" data-g="male"      onclick="pickG(this)">♂ Masculin</div>
+      <div class="g-btn" data-g="female"    onclick="pickG(this)">♀ Féminin</div>
+      <div class="g-btn" data-g="nonbinary" onclick="pickG(this)">⚧ Non‑binaire</div>
+    </div>
+  </div>
+  <button class="start-btn" onclick="startGame()">🚀 Lancer mon Empire</button>
+  <div class="ob-sub" style="font-size:10px">💡 Tu démarres avec 500 Hype — débloque tes premières zones !</div>
+</div>
+
+<!-- ── BARRE DU HAUT ── -->
+<div id="topbar">
+  <div class="cur">
+    <div class="cico cico-h">H</div>
+    <div>
+      <div class="cval cval-h" id="hdsp">0</div>
+      <div class="csub">HYPE</div>
+    </div>
+  </div>
+  <div class="pbadge">
+    <div class="pnm" id="pnm">—</div>
+    <div class="ptier" id="ptier">Débutant</div>
+  </div>
+  <div class="cur" style="justify-content:flex-end">
+    <div style="text-align:right">
+      <div class="cval cval-n" id="ndsp">0</div>
+      <div class="csub">NOTORIÉTÉ</div>
+    </div>
+    <div class="cico cico-n">⭐</div>
+  </div>
+</div>
+
+<!-- ── VIEWPORT CARTE 2D ── -->
+<div id="viewport">
+  <div id="mapcanvas">
+    <div id="map-label">◆ NEON EMPIRE ◆</div>
+    <!-- Zones injectées par JS -->
+  </div>
+</div>
+
+<!-- ── PANNEAU DE CONTRÔLE ── -->
+<div id="panel">
+  <div id="zib">
+    <span id="zib-e">🎵</span>
+    <div style="flex:1;min-width:0">
+      <div id="zib-n">Sélectionne une zone</div>
+      <div id="zib-h">Touche une zone sur la carte ci-dessus</div>
+    </div>
+    <div id="zib-lv"></div>
+  </div>
+  <div id="action-row">
+    <div id="clickwrap">
+      <div style="position:relative">
+        <button id="mbtn" onclick="doClick()">H<div class="cmult" id="cmult">×1</div></button>
+      </div>
+      <div id="hps-lbl">0 H/s</div>
+    </div>
+    <div id="zone-actions">
+      <div class="hint">👆 Touche une zone sur la carte pour voir ses options d'amélioration.</div>
+    </div>
+  </div>
+  <div id="tabbar">
+    <button class="tb on" id="t-carte"  onclick="switchTab('carte')">🗺️ Zones</button>
+    <button class="tb"    id="t-equipe" onclick="switchTab('equipe')">👥 Équipe</button>
+    <button class="tb"    id="t-stats"  onclick="switchTab('stats')">📊 Stats</button>
+  </div>
+</div>
+
+</div><!-- #app -->
+<script>
+'use strict';
+
+// ══════════════════════════════════════════════
+// CONFIG & DONNÉES
+// ══════════════════════════════════════════════
+const TICK = 200, SAVE = 'NE5', GR = 1.15;
+
+// Positions absolues des zones sur la toile 1000×950 px
+const LAYOUT = {
+  entrance:   {x:50,  y:28,  w:900, h:138},
+  parking:    {x:50,  y:206, w:196, h:238},
+  bar:        {x:286, y:206, w:330, h:238},
+  dj:         {x:656, y:206, w:294, h:394},
+  dancefloor: {x:50,  y:484, w:566, h:270},
+  vip:        {x:50,  y:794, w:900, h:130},
+};
+
+const ZDEFS = {
+  entrance:{id:'entrance',name:"L'Entrée",
+    itype:'hype',bi:1,bc:80,uc:0,nr:0,
+    tiers:[
+      {t:1, n:'Porte Cassée',      e:'🚪',d:'Rouillée, la peinture s\'écaille.',c:'zt1'},
+      {t:10,n:'Enseigne Néon',     e:'🌟',d:'Un néon attire les curieux.',       c:'zt2'},
+      {t:20,n:'Cordes en Velours', e:'💎',d:'Tapis rouge, videur imposant.',     c:'zt3'},
+      {t:30,n:'Marquise de Luxe',  e:'👑',d:'LED, célébrités, voituriers.',      c:'zt4'},
+    ],
+    ss:['bouncer'],
+    mapEmoji:[ ['🚪'], ['🌟','🚶'], ['💎','🕶️','🚶'], ['👑','✨','🎭'] ]},
+  parking:{id:'parking',name:'Parking',
+    itype:'hype',bi:0.5,bc:180,uc:1000,nr:0,
+    tiers:[
+      {t:1, n:'Terrain Vague',     e:'🅿️',d:'Un champ boueux.',              c:'zt1'},
+      {t:10,n:'Parking Goudronné', e:'🚗',d:'Asphalte propre, bien marqué.', c:'zt2'},
+      {t:20,n:'Parking VIP',       e:'🏎️',d:'Places réservées, voituriers.', c:'zt3'},
+      {t:30,n:'Voiturier de Luxe', e:'🌟',d:'Service en gants blancs.',      c:'zt4'},
+    ],
+    ss:[],
+    mapEmoji:[ ['🅿️'], ['🚗'], ['🏎️','🚗'], ['🌟','🏎️'] ]},
+  bar:{id:'bar',name:'Le Bar',
+    itype:'hype',bi:2,bc:140,uc:400,nr:0,
+    tiers:[
+      {t:1, n:'Bar de Fortune',    e:'🍺',d:'Deux caisses et une planche.',c:'zt1'},
+      {t:10,n:'Bar Néon',          e:'🍹',d:'Bouteilles lumineuses.',       c:'zt2'},
+      {t:20,n:'Cocktails Premium', e:'🥂',d:'Cristal et cocktails exotiques.',c:'zt3'},
+      {t:30,n:'Sky Bar',           e:'🍾',d:'Spiritueux du monde entier.',  c:'zt4'},
+    ],
+    ss:['bartender','waitress'],
+    mapEmoji:[ ['🍺'], ['🍹','🍸'], ['🥂','🍸','🍹'], ['🍾','🥂','✨'] ]},
+  dj:{id:'dj',name:"L'Espace DJ",
+    itype:'notoriete',bi:2,bc:320,uc:1500,nr:0,
+    tiers:[
+      {t:1, n:'Cabine Basique',    e:'🎧',d:'Platine d\'occasion bancale.',  c:'zt1'},
+      {t:10,n:'Setup Pro',         e:'🎵',d:'Tables pro, jeu de lumières.',  c:'zt2'},
+      {t:20,n:'Scène Principale',  e:'🎶',d:'Nexus concert, pyrotechnie.',   c:'zt3'},
+      {t:30,n:'Méga Scène',        e:'🎤',d:'L\'installation la plus avancée.',c:'zt4'},
+    ],
+    ss:['dj_artist'],
+    mapEmoji:[ ['🎧'], ['🎵','🎧'], ['🎶','🎵','💡'], ['🎤','✨','🎶'] ]},
+  dancefloor:{id:'dancefloor',name:'La Piste de Danse',
+    itype:'notoriete',bi:1,bc:240,uc:800,nr:0,
+    tiers:[
+      {t:1, n:'Parquet Poussiéreux', e:'💃',d:'Bois rayé, à peine dansable.',   c:'zt1'},
+      {t:10,n:'Piste LED',           e:'🕺',d:'Panneaux LED sous chaque pas.',   c:'zt2'},
+      {t:20,n:'Arène Boule à Facettes',e:'🪩',d:'Boules, lasers, fumée.',        c:'zt3'},
+      {t:30,n:'Scène Holographique', e:'✨',d:'Danseurs holographiques.',         c:'zt4'},
+    ],
+    ss:[],
+    mapEmoji:[ ['💃','🕺'], ['💃','🕺','💃'], ['🪩','💃','🕺','🪩'], ['✨','💃','🕺','💃','✨'] ]},
+  vip:{id:'vip',name:'Le Coin VIP',
+    itype:'hype',bi:10,bc:700,uc:3000,nr:50,
+    tiers:[
+      {t:1, n:'Coin Délimité',  e:'💺',d:'Vieux canapés, corde en velours.',c:'zt1'},
+      {t:10,n:'Section VIP',   e:'🥂',d:'Cuir et champagne sur glace.',    c:'zt2'},
+      {t:20,n:'Salon Privé',   e:'💎',d:'Majordome, bar privé.',           c:'zt3'},
+      {t:30,n:'Suite Sky Box', e:'🌹',d:'Penthouse au-dessus de la piste.',c:'zt4'},
+    ],
+    ss:[],
+    mapEmoji:[ ['💺','💺'], ['🥂','💺','💺'], ['💎','🥂','💺'], ['🌹','💎','✨'] ]},
+};
+
+const ORDER = ['entrance','parking','bar','dj','dancefloor','vip'];
+
+const SDEFS = {
+  bouncer:  {id:'bouncer',  name:'Videur',          e:'💪',zone:'entrance',bc:300,cg:1.5,ib:.25,max:8,
+    titles:['Bénévole','Videur Certifié','Ex‑Militaire','Portier Légendaire','Dieu de la Porte']},
+  bartender:{id:'bartender',name:'Barman',           e:'🍸',zone:'bar',     bc:400,cg:1.5,ib:.30,max:8,
+    titles:['Diplômé YouTube','Certifié Bar','Spécialiste Cocktails','Chef Mixologue','Grand Lauréat']},
+  waitress: {id:'waitress', name:'Serveur/Serveuse', e:'🧑‍🍳',zone:'bar',  bc:350,cg:1.4,ib:.20,max:8,
+    titles:['Premier Service','Expérimenté(e)','Personnel Senior','Spécialiste VIP','Service Sommelier']},
+  dj_artist:{id:'dj_artist',name:'DJ',               e:'🎧',zone:'dj',     bc:600,cg:2.0,ib:.50,max:5,hb:.10,
+    titles:['DJ Novice','David Guet‑ta','DJ Snake‑Eye','Da‑ft Punk‑ish','Tiëst‑Oh!']},
+};
+
+const PTIERS=[
+  {n:0,    t:'Novice en Boîte'},
+  {n:10,   t:'Promoteur Underground'},
+  {n:50,   t:'Habitué de la Scène'},
+  {n:200,  t:'Manager de Club'},
+  {n:500,  t:'Sensation de la Ville'},
+  {n:1000, t:'Légende Régionale'},
+  {n:5000, t:'Icône Nationale'},
+  {n:10000,t:'Légende Mondiale'},
+];
+
+// ══════════════════════════════════════════════
+// ÉTAT DU JEU
+// ══════════════════════════════════════════════
+let G={
+  player:{name:'',gender:''},
+  hype:500,not:0,totalH:500,clicks:0,secs:0,
+  zones:{
+    entrance:  {lv:1, on:true,  pt:1},
+    parking:   {lv:0, on:false, pt:1},
+    bar:       {lv:0, on:false, pt:1},
+    dj:        {lv:0, on:false, pt:1},
+    dancefloor:{lv:0, on:false, pt:1},
+    vip:       {lv:0, on:false, pt:1},
+  },
+  staff:{bouncer:0,bartender:0,waitress:0,dj_artist:0},
+  clickLv:1,
+  selZone:null,
+};
+
+// État de la carte (glisser/zoom)
+let MAP={ox:0,oy:0,scale:1,drag:false,sx:0,sy:0,sox:0,soy:0,moved:0,tapZone:null,ptrs:{},pinchD:0,pinchS:1};
+
+// ══════════════════════════════════════════════
+// SAUVEGARDE
+// ══════════════════════════════════════════════
+function save(){
+  try{const s={...G,selZone:null};localStorage.setItem(SAVE,JSON.stringify(s))}catch(e){}
+}
+function load(){
+  try{
+    const r=localStorage.getItem(SAVE);if(!r)return false;
+    const s=JSON.parse(r);
+    G={...G,...s,selZone:null};
+    const dz={entrance:{lv:1,on:true,pt:1},parking:{lv:0,on:false,pt:1},
+      bar:{lv:0,on:false,pt:1},dj:{lv:0,on:false,pt:1},
+      dancefloor:{lv:0,on:false,pt:1},vip:{lv:0,on:false,pt:1}};
+    G.zones={...dz,...s.zones};
+    G.staff={bouncer:0,bartender:0,waitress:0,dj_artist:0,...s.staff};
+    return !!G.player.name;
+  }catch(e){return false;}
+}
+
+// ══════════════════════════════════════════════
+// CALCULS
+// ══════════════════════════════════════════════
+function fmt(n){
+  n=Math.floor(n);
+  if(n<1000)return n+'';
+  if(n<1e6) return+(n/1e3).toFixed(1)+'K';
+  if(n<1e9) return+(n/1e6).toFixed(1)+'M';
+  if(n<1e12)return+(n/1e9).toFixed(1)+'Md';
+  return+(n/1e12).toFixed(1)+'B';
+}
+function ucost(id){return Math.ceil(ZDEFS[id].bc*Math.pow(GR,G.zones[id].lv||0))}
+function scost(id){return Math.ceil(SDEFS[id].bc*Math.pow(SDEFS[id].cg,G.staff[id]||0))}
+function getTier(id){
+  const d=ZDEFS[id],lv=G.zones[id]?.lv||0;
+  let r=d.tiers[0];
+  for(const t of d.tiers)if(lv>=t.t)r=t;
+  return r;
+}
+function getTierIdx(id){
+  const d=ZDEFS[id],lv=G.zones[id]?.lv||0;
+  let i=0;for(let j=0;j<d.tiers.length;j++)if(lv>=d.tiers[j].t)i=j;return i;
+}
+function zIncome(id){
+  const d=ZDEFS[id],z=G.zones[id];
+  if(!z?.on||z.lv<1)return 0;
+  let inc=d.bi*z.lv;
+  for(const sid of(d.ss||[])){const sd=SDEFS[sid];if(sd)inc*=(1+sd.ib*(G.staff[sid]||0));}
+  return inc;
+}
+function totalHps(){
+  let t=0;
+  for(const id of ORDER)if(ZDEFS[id].itype==='hype')t+=zIncome(id);
+  const dj=G.staff.dj_artist||0;
+  if(dj>0)t*=(1+(SDEFS.dj_artist.hb||0)*dj);
+  return t;
+}
+function totalNps(){
+  let t=0;for(const id of ORDER)if(ZDEFS[id].itype==='notoriete')t+=zIncome(id);return t;
+}
+function playerTier(){let r=PTIERS[0];for(const p of PTIERS)if(G.not>=p.n)r=p;return r;}
+
+// ══════════════════════════════════════════════
+// BOUCLE DE JEU
+// ══════════════════════════════════════════════
+let lastT=Date.now();
+function tick(){
+  const now=Date.now(),dt=(now-lastT)/1000;lastT=now;
+  const hg=totalHps()*dt,ng=totalNps()*dt;
+  G.hype+=hg;G.totalH+=hg;G.not+=ng;G.secs+=dt;
+  updateTopBar();save();
+}
+
+// ══════════════════════════════════════════════
+// CLIC MANUEL
+// ══════════════════════════════════════════════
+function doClick(){
+  G.hype+=G.clickLv;G.totalH+=G.clickLv;G.clicks++;
+  const b=document.getElementById('mbtn').getBoundingClientRect();
+  const app=document.getElementById('app').getBoundingClientRect();
+  spawnAppFt('+'+G.clickLv+'H','h',b.left-app.left+b.width/2,b.top-app.top-8);
+  updateTopBar();save();
+}
+
+// ══════════════════════════════════════════════
+// ACTIONS ZONES
+// ══════════════════════════════════════════════
+function unlockZone(id){
+  const d=ZDEFS[id],z=G.zones[id];
+  if(z.on)return;
+  if(G.hype<d.uc){toast('Pas assez de Hype !','❌');return;}
+  if(G.not<d.nr){toast(`Il faut ${d.nr} Notoriété !`,'⭐');return;}
+  G.hype-=d.uc;z.on=true;z.lv=1;
+  save();refreshZoneEl(id);updateTopBar();renderPanel();
+  toast(`${d.name} est ouvert !`,d.tiers[0].e);
+}
+function upgradeZone(id){
+  const d=ZDEFS[id],z=G.zones[id];
+  if(!z.on)return;
+  const c=ucost(id);
+  if(G.hype<c){toast('Pas assez de Hype !','❌');return;}
+  G.hype-=c;z.lv++;
+  const nt=getTier(id);
+  if(nt.t>(z.pt||1)){z.pt=nt.t;toast(`🎉 Palier ! ${nt.n}`,nt.e);}
+  save();refreshZoneEl(id);updateTopBar();renderPanel();
+}
+function hireStaff(sid){
+  const d=SDEFS[sid],cnt=G.staff[sid]||0;
+  if(cnt>=d.max){toast('Effectif max atteint !','⚠️');return;}
+  const c=scost(sid);
+  if(G.hype<c){toast('Pas assez de Hype !','❌');return;}
+  if(!G.zones[d.zone]?.on){toast(`Débloque ${ZDEFS[d.zone].name} d'abord !`,'🔒');return;}
+  G.hype-=c;G.staff[sid]=cnt+1;
+  toast(`Recruté : ${d.titles[Math.min(cnt,d.titles.length-1)]}`,d.e);
+  save();updateTopBar();renderPanel();
+}
+
+// ══════════════════════════════════════════════
+// RENDU BARRE DU HAUT
+// ══════════════════════════════════════════════
+function updateTopBar(){
+  document.getElementById('hdsp').textContent=fmt(G.hype);
+  document.getElementById('ndsp').textContent=fmt(G.not);
+  document.getElementById('pnm').textContent=G.player.name||'—';
+  document.getElementById('ptier').textContent=playerTier().t;
+  document.getElementById('hps-lbl').textContent=fmt(totalHps())+' H/s';
+  document.getElementById('cmult').textContent='×'+G.clickLv;
+}
+
+// ══════════════════════════════════════════════
+// CONSTRUCTION DE LA CARTE
+// ══════════════════════════════════════════════
+function buildMap(){
+  const canvas=document.getElementById('mapcanvas');
+  // Remove old zone elements (keep label)
+  canvas.querySelectorAll('.zone').forEach(e=>e.remove());
+  for(const id of ORDER){
+    const p=LAYOUT[id];
+    const el=document.createElement('div');
+    el.className='zone';el.id='z-'+id;el.dataset.id=id;
+    el.style.cssText=`left:${p.x}px;top:${p.y}px;width:${p.w}px;height:${p.h}px`;
+    canvas.appendChild(el);
+    refreshZoneEl(id);
+  }
+}
+
+function refreshZoneEl(id){
+  const el=document.getElementById('z-'+id);if(!el)return;
+  const d=ZDEFS[id],z=G.zones[id];
+  const locked=!z.on,tier=getTier(id),tidx=getTierIdx(id),lv=z.lv||0;
+  const inc=zIncome(id);
+
+  // Classes
+  el.className='zone'+(locked?' locked':' '+tier.c)+(G.selZone===id?' sel':'');
+
+  // Taille emoji en fonction des dimensions de la zone
+  const p=LAYOUT[id];
+  const eSize=Math.round(Math.min(p.w,p.h)*0.14);
+
+  if(locked){
+    el.innerHTML=`
+      <div style="font-size:${Math.min(eSize,24)}px">🔒</div>
+      <div class="zn">${d.name}</div>
+      <div class="zlk">${fmt(d.uc)} 🪙</div>
+      ${d.nr>0?`<div class="zlkr">${d.nr} ⭐ requis</div>`:''}`;
+    return;
+  }
+
+  // Emojis selon tier
+  const emList=d.mapEmoji?d.mapEmoji[Math.min(tidx,d.mapEmoji.length-1)]:[tier.e];
+  let emojiHtml='';
+  if(id==='dancefloor'&&lv>0){
+    emojiHtml=emList.map((e,i)=>`<span class="bd" style="animation-delay:${i*.22}s;font-size:${eSize}px">${e}</span>`).join('');
+  } else if(id==='dj'&&lv>0){
+    emojiHtml=emList.map((e,i)=>`<span class="${i===0?'djp':''}" style="font-size:${eSize}px">${e}</span>`).join(' ');
+  } else {
+    emojiHtml=`<span style="font-size:${eSize}px">${emList.join(' ')}</span>`;
+  }
+
+  const pct=lv>0?(((lv-1)%10)+1)/10*100:0;
+  const itype=d.itype==='hype'?'h':'n';
+  const isym=d.itype==='hype'?'🪙':'⭐';
+
+  el.innerHTML=`
+    <div class="ze">${emojiHtml}</div>
+    <div class="zn">${d.name}</div>
+    <div class="zt">Nv.${lv} · ${tier.n}</div>
+    <div class="zi zi-${itype}">+${fmt(inc)} ${isym}/s</div>
+    <div class="zpb"><div class="zpf" style="width:${pct}%"></div></div>`;
+}
+
+// ══════════════════════════════════════════════
+// SÉLECTION D'UNE ZONE
+// ══════════════════════════════════════════════
+function selectZone(id){
+  const prev=G.selZone;
+  G.selZone=id;
+  if(prev&&prev!==id)refreshZoneEl(prev);
+  refreshZoneEl(id);
+  // Mettre à jour la barre d'info
+  const d=ZDEFS[id],z=G.zones[id],tier=getTier(id);
+  document.getElementById('zib-e').textContent=tier.e;
+  document.getElementById('zib-n').textContent=d.name;
+  document.getElementById('zib-h').textContent=tier.n+(z.lv>0?' — '+tier.d:'');
+  document.getElementById('zib-lv').textContent=z.lv>0?'Nv.'+z.lv:'🔒';
+  renderPanel();
+}
+
+// ══════════════════════════════════════════════
+// PANNEAU D'ACTIONS
+// ══════════════════════════════════════════════
+let curTab='carte';
+
+function switchTab(name){
+  curTab=name;
+  document.querySelectorAll('.tb').forEach(b=>b.classList.remove('on'));
+  document.getElementById('t-'+name)?.classList.add('on');
+  renderPanel();
+}
+
+function renderPanel(){
+  if(curTab==='carte')renderZoneActions();
+  else if(curTab==='equipe')renderEquipe();
+  else renderStats();
+}
+
+function renderZoneActions(){
+  const el=document.getElementById('zone-actions');
+  if(!G.selZone){
+    el.innerHTML='<div class="hint">👆 Touche une zone sur la carte pour voir ses options d\'amélioration.</div>';
+    return;
+  }
+  const id=G.selZone,d=ZDEFS[id],z=G.zones[id],tier=getTier(id);
+  let h='';
+
+  if(!z.on){
+    const ok=G.hype>=d.uc&&G.not>=d.nr;
+    const rn=d.nr>0?`<span class="abd" style="color:var(--pink)">Nécessite ${d.nr}⭐ (tu as ${Math.floor(G.not)})</span>`:'';
+    h=`<button class="abt ${ok?'':'na'}" onclick="unlockZone('${id}')">
+      <div class="abt-l"><span class="abn">🔓 Débloquer ${d.name}</span>${rn}</div>
+      <span class="abc">${fmt(d.uc)} 🪙</span>
+    </button>`;
+  } else {
+    const c=ucost(id),can=G.hype>=c,inc=zIncome(id);
+    const il=d.itype==='hype'?'🪙/s':'⭐/s';
+    const toN=10-(((z.lv-1)%10));
+    h=`<button class="abt ${can?'':'na'}" onclick="upgradeZone('${id}')">
+      <div class="abt-l">
+        <span class="abn">⬆️ Améliorer → Niveau ${z.lv+1}</span>
+        <span class="abd">${fmt(inc)} ${il} → ${fmt(d.bi*(z.lv+1))} ${il} · ${toN} niv. au palier</span>
+      </div>
+      <span class="abc">${fmt(c)} 🪙</span>
+    </button>`;
+
+    for(const sid of(d.ss||[])){
+      const sd=SDEFS[sid];if(!sd)continue;
+      const cnt=G.staff[sid]||0,mx=cnt>=sd.max,sc=scost(sid),ok=!mx&&G.hype>=sc;
+      const ttl=sd.titles[Math.min(cnt,sd.titles.length-1)];
+      h+=`<button class="abt vl ${ok?'':'na'}" onclick="hireStaff('${sid}')">
+        <div class="abt-l">
+          <span class="abn">${sd.e} ${sd.name} (${cnt}/${sd.max})</span>
+          <span class="abd">${ttl} · +${(sd.ib*100).toFixed(0)}% revenus</span>
+        </div>
+        <span class="abc">${mx?'MAX':fmt(sc)+' 🪙'}</span>
+      </button>`;
+    }
+
+    const ntt=d.tiers.find(x=>x.t>tier.t);
+    if(ntt){
+      h+=`<div class="tier-prev">
+        <span style="font-size:18px">${ntt.e}</span>
+        <div>
+          <div style="font-size:10px;font-weight:700;color:var(--gold)">${ntt.n}</div>
+          <div style="font-size:9px;color:var(--dim)">Se débloque au Niveau ${ntt.t}</div>
+        </div>
+      </div>`;
+    }
+  }
+  el.innerHTML=h;
+}
+
+function renderEquipe(){
+  const el=document.getElementById('zone-actions');
+  let h='';
+  for(const [sid,d] of Object.entries(SDEFS)){
+    const cnt=G.staff[sid]||0,c=scost(sid),mx=cnt>=d.max;
+    const zu=G.zones[d.zone]?.on,ok=zu&&!mx&&G.hype>=c;
+    const ttl=d.titles[Math.min(cnt,d.titles.length-1)];
+    const bns=sid==='dj_artist'
+      ?`+${(d.ib*100).toFixed(0)}% Notoriété DJ & +${((d.hb||0)*100).toFixed(0)}% Hype global`
+      :`+${(d.ib*100).toFixed(0)}% revenus ${ZDEFS[d.zone].name}`;
+    h+=`<button class="abt vl ${ok?'':'na'}" onclick="hireStaff('${sid}')">
+      <div class="abt-l">
+        <span class="abn">${d.e} ${d.name} (${cnt}/${d.max})</span>
+        <span class="abd">${ttl}${!zu?' · 🔒 zone verrouillée':' · '+bns}</span>
+      </div>
+      <span class="abc">${mx?'MAX':fmt(c)+' 🪙'}</span>
+    </button>`;
+  }
+  document.getElementById('zone-actions').innerHTML=h;
+}
+
+function renderStats(){
+  const s=G.secs;
+  const ts=s<60?Math.floor(s)+'s':s<3600?Math.floor(s/60)+'min':Math.floor(s/3600)+'h '+Math.floor((s%3600)/60)+'min';
+  const tier=playerTier();
+  const open=Object.values(G.zones).filter(z=>z.on&&z.lv>0).length;
+  document.getElementById('zone-actions').innerHTML=`
+    <div style="font-size:10px;line-height:2;color:var(--dim)">
+      <div style="display:flex;justify-content:space-between"><span>🪙 Hype/s</span><span style="color:var(--gold)">${fmt(totalHps())}</span></div>
+      <div style="display:flex;justify-content:space-between"><span>⭐ Notoriété/s</span><span style="color:var(--pink)">${fmt(totalNps())}</span></div>
+      <div style="display:flex;justify-content:space-between"><span>💰 Hype total gagné</span><span style="color:var(--gold)">${fmt(G.totalH)}</span></div>
+      <div style="display:flex;justify-content:space-between"><span>🖱️ Clics manuels</span><span style="color:var(--cyan)">${G.clicks.toLocaleString('fr-FR')}</span></div>
+      <div style="display:flex;justify-content:space-between"><span>⏱️ Temps de jeu</span><span style="color:var(--cyan)">${ts}</span></div>
+      <div style="display:flex;justify-content:space-between"><span>🏆 Rang</span><span style="color:var(--violet)">${tier.t}</span></div>
+      <div style="display:flex;justify-content:space-between"><span>🗺️ Zones actives</span><span style="color:var(--cyan)">${open}/6</span></div>
+      <div style="display:flex;justify-content:space-between"><span>💪 Videurs</span><span>${G.staff.bouncer}</span></div>
+      <div style="display:flex;justify-content:space-between"><span>🍸 Barmen</span><span>${G.staff.bartender}</span></div>
+      <div style="display:flex;justify-content:space-between"><span>🎧 DJs</span><span>${G.staff.dj_artist}</span></div>
+    </div>`;
+}
+
+// ══════════════════════════════════════════════
+// GLISSER / ZOOM — CARTE
+// ══════════════════════════════════════════════
+function applyMapTransform(){
+  document.getElementById('mapcanvas').style.transform=
+    `translate(${MAP.ox}px,${MAP.oy}px) scale(${MAP.scale})`;
+}
+
+function zoomAt(cx,cy,factor){
+  const ns=Math.max(.35,Math.min(2.5,MAP.scale*factor));
+  const sc=ns/MAP.scale;
+  MAP.ox=cx-(cx-MAP.ox)*sc;
+  MAP.oy=cy-(cy-MAP.oy)*sc;
+  MAP.scale=ns;
+  applyMapTransform();
+}
+
+function initMapInteraction(){
+  const vp=document.getElementById('viewport');
+
+  // Position initiale : ajuster pour montrer toute la carte
+  const vpW=vp.offsetWidth||480,vpH=vp.offsetHeight||320;
+  MAP.scale=Math.min(vpW/1000,vpH/950)*.92;
+  MAP.ox=(vpW-1000*MAP.scale)/2;
+  MAP.oy=(vpH-950*MAP.scale)/2;
+  applyMapTransform();
+
+  // ── Pointer events (unifié souris + tactile) ──
+  vp.addEventListener('pointerdown',e=>{
+    vp.setPointerCapture(e.pointerId);
+    MAP.ptrs[e.pointerId]={x:e.clientX,y:e.clientY};
+    const keys=Object.keys(MAP.ptrs);
+    if(keys.length===1){
+      MAP.drag=true;MAP.sx=e.clientX;MAP.sy=e.clientY;
+      MAP.sox=MAP.ox;MAP.soy=MAP.oy;MAP.moved=0;
+      MAP.tapZone=e.target.closest('.zone')?.dataset.id||null;
+      vp.classList.add('drag');
+    } else if(keys.length===2){
+      MAP.drag=false;
+      const pts=Object.values(MAP.ptrs);
+      MAP.pinchD=Math.hypot(pts[0].x-pts[1].x,pts[0].y-pts[1].y);
+      MAP.pinchS=MAP.scale;
+    }
+  },{passive:true});
+
+  vp.addEventListener('pointermove',e=>{
+    if(!MAP.ptrs[e.pointerId])return;
+    MAP.ptrs[e.pointerId]={x:e.clientX,y:e.clientY};
+    const keys=Object.keys(MAP.ptrs);
+    if(keys.length===1&&MAP.drag){
+      const dx=e.clientX-MAP.sx,dy=e.clientY-MAP.sy;
+      MAP.moved=Math.hypot(dx,dy);
+      MAP.ox=MAP.sox+dx;MAP.oy=MAP.soy+dy;
+      applyMapTransform();
+    } else if(keys.length===2&&MAP.pinchD>0){
+      const pts=Object.values(MAP.ptrs);
+      const d=Math.hypot(pts[0].x-pts[1].x,pts[0].y-pts[1].y);
+      const vpR=vp.getBoundingClientRect();
+      const cx=(pts[0].x+pts[1].x)/2-vpR.left;
+      const cy=(pts[0].y+pts[1].y)/2-vpR.top;
+      const ns=Math.max(.35,Math.min(2.5,MAP.pinchS*(d/MAP.pinchD)));
+      const sc=ns/MAP.scale;
+      MAP.ox=cx-(cx-MAP.ox)*sc;
+      MAP.oy=cy-(cy-MAP.oy)*sc;
+      MAP.scale=ns;
+      applyMapTransform();
+    }
+  },{passive:true});
+
+  function onUp(e){
+    const wasDrag=MAP.drag,moved=MAP.moved,tapZ=MAP.tapZone;
+    delete MAP.ptrs[e.pointerId];
+    const remaining=Object.keys(MAP.ptrs).length;
+    if(remaining===0){
+      MAP.drag=false;vp.classList.remove('drag');MAP.pinchD=0;
+      if(wasDrag&&moved<10&&tapZ)selectZone(tapZ);
+    } else if(remaining===1){
+      MAP.pinchD=0;
+      const pt=Object.values(MAP.ptrs)[0];
+      MAP.drag=true;MAP.sx=pt.x;MAP.sy=pt.y;
+      MAP.sox=MAP.ox;MAP.soy=MAP.oy;MAP.moved=0;
+    }
+  }
+  vp.addEventListener('pointerup',onUp,{passive:true});
+  vp.addEventListener('pointercancel',e=>{delete MAP.ptrs[e.pointerId];MAP.drag=false;},{passive:true});
+
+  // Molette souris
+  vp.addEventListener('wheel',e=>{
+    e.preventDefault();
+    const vpR=vp.getBoundingClientRect();
+    zoomAt(e.clientX-vpR.left,e.clientY-vpR.top,e.deltaY>0?.88:1.14);
+  },{passive:false});
+}
+
+// ══════════════════════════════════════════════
+// TEXTES FLOTTANTS
+// ══════════════════════════════════════════════
+function spawnAppFt(txt,type,x,y){
+  const el=document.createElement('div');
+  el.className=`ft ft-${type}`;el.textContent=txt;
+  el.style.cssText=`left:${x-16}px;top:${y}px;position:absolute`;
+  document.getElementById('app').appendChild(el);
+  setTimeout(()=>el.remove(),1500);
+}
+
+// Textes flottants sur la carte (coordonnées dans le canvas)
+let ftTick=0;
+function mapFloats(){
+  ftTick++;if(ftTick%20!==0)return; // toutes les 4s
+  const canvas=document.getElementById('mapcanvas');
+  for(const id of ORDER){
+    const z=G.zones[id];if(!z?.on||z.lv<1)continue;
+    const d=ZDEFS[id],inc=zIncome(id);if(inc<=0)continue;
+    const p=LAYOUT[id];
+    const el=document.createElement('div');
+    el.className=`ft ft-${d.itype==='hype'?'h':'n'}`;
+    el.textContent=d.itype==='hype'?`+${fmt(inc*4)}H`:`+${fmt(inc*4)}⭐`;
+    el.style.left=(p.x+p.w/2-20)+'px';
+    el.style.top=(p.y+p.h/2-20)+'px';
+    canvas.appendChild(el);
+    setTimeout(()=>el.remove(),1500);
+  }
+}
+
+// ══════════════════════════════════════════════
+// TOAST
+// ══════════════════════════════════════════════
+function toast(msg,ico='🎉'){
+  document.querySelector('.toast')?.remove();
+  const el=document.createElement('div');
+  el.className='toast';
+  el.innerHTML=`${ico} <strong>${msg}</strong>`;
+  document.getElementById('app').appendChild(el);
+  setTimeout(()=>el.remove(),3000);
+}
+
+// ══════════════════════════════════════════════
+// ACCUEIL
+// ══════════════════════════════════════════════
+let selG='';
+function pickG(el){document.querySelectorAll('.g-btn').forEach(b=>b.classList.remove('on'));el.classList.add('on');selG=el.dataset.g;}
+function startGame(){
+  const inp=document.getElementById('obin'),nm=inp.value.trim();
+  if(!nm){inp.focus();toast('Veuillez entrer votre prénom !','⚠️');return;}
+  if(!selG){toast('Veuillez sélectionner votre identité !','⚠️');return;}
+  G.player.name=nm;G.player.gender=selG;save();
+  const ob=document.getElementById('ob');
+  ob.style.opacity='0';setTimeout(()=>ob.style.display='none',500);
+  toast(`Bienvenue, ${nm} ! Construis ton empire ! 🎵`,'🚀');
+}
+
+// ══════════════════════════════════════════════
+// INITIALISATION
+// ══════════════════════════════════════════════
+(function init(){
+  const hasSave=load();
+  if(hasSave)document.getElementById('ob').style.display='none';
+
+  buildMap();
+  updateTopBar();
+  renderPanel();
+  initMapInteraction();
+
+  // Boucle principale
+  setInterval(()=>{
+    tick();
+    mapFloats();
+    if(curTab==='stats')renderStats();
+    else if(curTab==='equipe')renderEquipe();
+    else if(G.selZone)renderZoneActions();
+  },TICK);
+
+  // Rafraîchissement des zones sur la carte toutes les 2s
+  setInterval(()=>{for(const id of ORDER)refreshZoneEl(id);},2000);
+})();
+</script>
+</body>
+</html>
